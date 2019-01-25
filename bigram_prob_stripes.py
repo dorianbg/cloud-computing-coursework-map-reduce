@@ -12,14 +12,18 @@ class MRWordBigramProb(MRJob):
                 next_word = words[index+1]
                 bigram_count[next_word] += 1
                 yield word, bigram_count
-                # result in eg ( word, {'following_word' : 1} )
+                '''
+                result is tuple ( word, {'following_word' : 1} )
+                but why do we use a dictionary since it's quite expensive, 
+                we could just yield (word, following_word)
+                '''
 
     def combiner(self, key, stripes):
-        c = Counter()
+        combined_stripes = Counter()
         for stripe in stripes:
-            c.update(stripe)
+            combined_stripes.update(stripe)
         # result in eg ( word, {'following_word' : 1}, word, {'following_word' : 2} )
-        yield key, c
+        yield key, combined_stripes
 
     def reducer(self, word, stripes):
         c = Counter()
@@ -29,7 +33,7 @@ class MRWordBigramProb(MRJob):
         for key in c:
             yield (word + "_" + key), (c[key] / count_total)
 
-## check that all probabilities add up to 1
+        ## check that all probabilities add up to 1
 
     def steps(self):
         return [
