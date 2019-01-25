@@ -6,17 +6,14 @@ from collections import defaultdict, Counter
 class MRWordBigramProb(MRJob):
     def mapper(self, joke_id, content):
         words = re.sub('\s+', ' ', re.sub('[^a-z]+', ' ', re.sub('\'', '', content.lower()))).strip(' ').split(" ")
-        for index, word in enumerate(words):
-            if index < len(words) - 1:
-                bigram_count = defaultdict(lambda: 0)
-                next_word = words[index+1]
-                bigram_count[next_word] += 1
-                yield word, bigram_count
-                '''
-                result is tuple ( word, {'following_word' : 1} )
-                but why do we use a dictionary since it's quite expensive, 
-                we could just yield (word, following_word)
-                '''
+        for original_word in set(words):  # goes over distinct words
+            bigram_count = defaultdict(lambda: 0)
+            for index, neighbour_word in enumerate(words):
+                if index < len(words) - 1:
+                    if neighbour_word == original_word:
+                        next_word = words[index+1]
+                        bigram_count[next_word] += 1
+            yield original_word, bigram_count
 
     def combiner(self, key, stripes):
         combined_stripes = Counter()
