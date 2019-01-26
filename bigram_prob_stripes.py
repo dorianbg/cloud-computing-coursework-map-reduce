@@ -6,13 +6,16 @@ from collections import defaultdict, Counter
 class MRWordBigramProb(MRJob):
     def mapper(self, joke_id, content):
         words = re.sub('\s+', ' ', re.sub('[^a-z]+', ' ', re.sub('\'', '', content.lower()))).strip(' ').split(" ")
-        for original_word in set(words):  # goes over distinct words
+
+        following_words = defaultdict(lambda: [])
+        for index, word in enumerate(words):
+            if index < len(words) - 1:
+                following_words[word].append(words[index+1])
+
+        for original_word in following_words.keys():
             bigram_count = defaultdict(lambda: 0)
-            for index, neighbour_word in enumerate(words):
-                if index < len(words) - 1:
-                    if neighbour_word == original_word:
-                        next_word = words[index+1]
-                        bigram_count[next_word] += 1
+            for following_word in following_words[original_word]:
+                bigram_count[following_word] += 1
             yield original_word, bigram_count
 
     def combiner(self, key, stripes):
