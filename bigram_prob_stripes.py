@@ -4,26 +4,21 @@ from collections import defaultdict, Counter
 
 
 class MRWordBigramProb(MRJob):
+    def mapper_init(self):
+        self.following_words = defaultdict(lambda: [])
+
     def mapper(self, joke_id, content):
         words = re.sub('\s+', ' ', re.sub('[^a-z]+', ' ', re.sub('\'', '', content.lower()))).strip(' ').split(" ")
-
-        following_words = defaultdict(lambda: [])
         for index, word in enumerate(words):
             if index < len(words) - 1:
-                following_words[word].append(words[index+1])
+                self.following_words[word].append(words[index+1])
 
-        for original_word in following_words.keys():
+    def mapper_final(self):
+        for original_word in self.following_words.keys():
             bigram_count = defaultdict(lambda: 0)
-            for following_word in following_words[original_word]:
+            for following_word in self.following_words[original_word]:
                 bigram_count[following_word] += 1
             yield original_word, bigram_count
-
-    def combiner(self, key, stripes):
-        combined_stripes = Counter()
-        for stripe in stripes:
-            combined_stripes.update(stripe)
-        # result in eg ( word, {'following_word' : 1}, word, {'following_word' : 2} )
-        yield key, combined_stripes
 
     def reducer(self, word, stripes):
         c = Counter()
@@ -31,14 +26,13 @@ class MRWordBigramProb(MRJob):
             c.update(stripe)
         count_total = sum(c.values())
         for key in c:
-            yield (word + "_" + key), (c[key] / count_total)
-
-        ## check that all probabilities add up to 1
+            yield (word + "_" + key), (c[key] / count_total)  # all probabilities add up to 1
 
     def steps(self):
         return [
-            MRStep(mapper=self.mapper,
-                   combiner=self.combiner,
+            MRStep(mapper_init=self.mapper_init,
+                   mapper=self.mapper,
+                   mapper_final=self.mapper_final,
                    reducer=self.reducer)
         ]
 
