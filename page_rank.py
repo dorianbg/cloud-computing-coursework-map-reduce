@@ -53,10 +53,9 @@ class MRPageRank(MRJob):
                 page_rank_sum += page_rank_contribution
             else:
                 node = page_rank_contribution
-        if node is None:
-            node = {'out_links': ['']}  # what do we do with dangling nodes in the simple page rank ?
-        node['page_rank'] = self.options.damping_factor + (1-self.options.damping_factor) * page_rank_sum
-        yield node_id, node
+        if node is not None:
+            node['page_rank'] = self.options.damping_factor + (1-self.options.damping_factor) * page_rank_sum
+            yield node_id, node
 
     def top_mapper(self, node_id, node):
         yield node['page_rank'], node_id
