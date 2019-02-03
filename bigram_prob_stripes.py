@@ -1,6 +1,7 @@
 from mrjob.job import MRJob, MRStep
 import re
 from collections import defaultdict, Counter
+import operator
 
 
 class MRWordBigramProb(MRJob):
@@ -35,6 +36,9 @@ class MRWordBigramProb(MRJob):
                 bigram_count[following_word] += 1
             yield original_word, bigram_count
 
+    def reducer_init(self):
+        self.bigram_frequencies = []
+
     def reducer(self, word, stripes):
         """
 
@@ -47,14 +51,22 @@ class MRWordBigramProb(MRJob):
             counts.update(stripe)
         count_total = sum(counts.values())
         for following_word in counts:
-            yield (word + "_" + following_word), (counts[following_word] / count_total)  # all probabilities add up to 1
+            self.bigram_frequencies.append((word, following_word, (counts[following_word] / count_total)))
+
+    def reducer_final(self):
+        sorted_bigram_frequencies = sorted(self.bigram_frequencies, key=operator.itemgetter(0, 2))
+        for bigram in sorted_bigram_frequencies:
+            yield bigram[0] + "-" + bigram[1], bigram[2]
 
     def steps(self):
         steps = [
             MRStep(mapper_init=self.mapper_init,
                    mapper=self.mapper,
                    mapper_final=self.mapper_final,
-                   reducer=self.reducer)
+                   reducer_init=self.reducer_init,
+                   reducer=self.reducer,
+                   reducer_final=self.reducer_final
+            )
         ]
         return steps
 

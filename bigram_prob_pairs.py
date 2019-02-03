@@ -1,6 +1,7 @@
 from mrjob.job import MRJob, MRStep
 import re
 from collections import defaultdict
+import operator
 
 
 class MRWordBigramProb(MRJob):
@@ -34,6 +35,7 @@ class MRWordBigramProb(MRJob):
         :return:
         """
         self.total_word_count = {}
+        self.bigram_frequencies = []
 
     def reducer(self, pair, counts):
         """
@@ -47,7 +49,12 @@ class MRWordBigramProb(MRJob):
         if following_word == "*":
             self.total_word_count[word] = sum(counts)
         else:
-            yield (word + "_" + following_word), (sum(counts) / self.total_word_count[word])  # all probabilities add up to 1
+            self.bigram_frequencies.append((word, following_word, (sum(counts) / self.total_word_count[word])))
+
+    def reducer_final(self):
+        sorted_bigram_frequencies = sorted(self.bigram_frequencies, key=operator.itemgetter(0, 2))
+        for bigram in sorted_bigram_frequencies:
+            yield bigram[0] + "-" + bigram[1], bigram[2]
 
     def steps(self):
         """
@@ -75,6 +82,7 @@ class MRWordBigramProb(MRJob):
                    mapper_final=self.mapper_final,
                    reducer_init=self.reducer_init,
                    reducer=self.reducer,
+                   reducer_final=self.reducer_final,
                    jobconf=jobconf
             )
         ]
