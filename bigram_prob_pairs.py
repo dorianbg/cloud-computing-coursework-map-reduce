@@ -1,37 +1,84 @@
 from mrjob.job import MRJob, MRStep
 import re
-from collections import defaultdict, Counter
+from collections import defaultdict
 
 
 class MRWordBigramProb(MRJob):
+    MRJob.PARTITIONER = 'org.apache.hadoop.mapred.lib.KeyFieldBasedPartitioner'
+
+    def mapper_init(self):
+        self.pair_counts = defaultdict(lambda: 0)
+
     def mapper(self, joke_id, content):
+        """
+        for each encountered word in the creates a
+        ignore the last word in a sentence as it has not following words.
+
+        :param joke_id:
+        :param content:
+        :return: tuple of ((word, following_word),1) or ((word,*))
+        """
         words = re.sub('\s+', ' ', re.sub('[^a-z]+', ' ', re.sub('\'', '', content.lower()))).strip(' ').split(" ")
         for index, word in enumerate(words):
             if index < len(words) - 1:
-                next_word = words[index + 1]
-            else:  # the last word
-                next_word = ''
-            bigram_count[next_word] += 1
-            yield (word, next_word), 1
+                self.pair_counts[(word, "*")] += 1
+                self.pair_counts[(word, words[index+1])] += 1
 
-    ## needs a partitioner + a sorter
-    # we need to yield - (word,'') to count the N of word
-    # we need to yield - (word, word') to count the N of word,word' combinations
-    def reducer(self, pair, count):
-        c = Counter()
-        for stripe in stripes:
-            c.update(stripe)
-        count_total = sum(c.values())
-        del c['']
-        for key in c:
-            yield (word + "_" + key), (c[key] / count_total)
+    def mapper_final(self):
+        for pair in self.pair_counts.keys():
+            yield pair, self.pair_counts[pair]
+
+    def reducer_init(self):
+        """
+        keeps state over multiple reduce iterations
+        :return:
+        """
+        self.total_word_count = {}
+
+    def reducer(self, pair, counts):
+        """
+        does the final calculation
+        :param pair:
+        :param counts:
+        :return:
+        """
+        word = pair[0]
+        following_word = pair[1]
+        if following_word == "*":
+            self.total_word_count[word] = sum(counts)
+        else:
+            yield (word + "_" + following_word), (sum(counts) / self.total_word_count[word])  # all probabilities add up to 1
 
     def steps(self):
+        """
+        jobconf = {
+            'mapred.output.key.comparator.class': 'org.apache.hadoop.mapred.lib.KeyFieldBasedComparator',
+            'mapred.text.key.comparator.options': '-k 1',
+            'mapred.text.key.partitioner.options': '-k 2',
+
+            'mapreduce.map.output.key.field.separator': ' ',
+            'stream.map.output.field.separator': ' ',
+            'mapreduce.partition.keypartitioner.options': '-k1,1',
+            'mapreduce.job.output.key.comparator.class': 'org.apache.hadoop.mapreduce.lib.partition.KeyFieldBasedComparator',
+            'mapreduce.partition.keycomparator.options': '-k2,2r',
+        }
+        """
+        jobconf = {
+            'stream.num.map.output.key.fields': '2',
+            'mapred.output.key.comparator.class': 'org.apache.hadoop.mapred.lib.KeyFieldBasedComparator',
+            'mapred.text.key.comparator.options': '-k1,1',
+            'mapred.text.key.partitioner.options': '-k2,2r',
+        }
         return [
-            MRStep(mapper=self.mapper,
-                   reducer=self.reducer)
+            MRStep(mapper_init=self.mapper_init,
+                   mapper=self.mapper,
+                   mapper_final=self.mapper_final,
+                   reducer_init=self.reducer_init,
+                   reducer=self.reducer,
+                   jobconf=jobconf
+            )
         ]
 
 
 if __name__ == '__main__':
-    MRWordBigramProb.run()
+    MRWordBigramProb().run()
