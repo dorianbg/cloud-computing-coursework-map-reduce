@@ -7,16 +7,20 @@ import operator
 class MRWordBigramProb(MRJob):
     def mapper_init(self):
         """
-        initialise the dictionary for "in-mapper" combining
+        Initialise the dictionary for "in-mapper" combining
+        where key will be a word and values are a list
+
         :return:
         """
         self.following_words = defaultdict(lambda: [])
 
     def mapper(self, joke_id, content):
         """
-        for each encountered word in the text add a entry to the list of following words.
-        ignore the last word in a sentence as it has not following words.
-        :param joke_id:
+        For each encountered word in the text, add a entry to the list of following words.
+
+        We ignore the last word in a sentence as it has not following words.
+
+        :param joke_id: ignored
         :param content:
         :return:
         """
@@ -27,20 +31,31 @@ class MRWordBigramProb(MRJob):
 
     def mapper_final(self):
         """
-        create a stripe out of the list of the succeeding words for each word
+        Create a "stripe" out of the list of the succeeding words for each word.
+
+        For each word, loops over all the following words (stored in a list) and places them into
+        a dictionary which counts the numbers of their occurrences.
+
         :return:
         """
-        for original_word in self.following_words.keys():
+        for word in self.following_words.keys():
             bigram_count = defaultdict(lambda: 0)
-            for following_word in self.following_words[original_word]:
+            for following_word in self.following_words[word]:
                 bigram_count[following_word] += 1
-            yield original_word, bigram_count
+            yield word, bigram_count
 
     def reducer_init(self):
+        """
+        Keeps state over multiple reduce iterations and required for sorting
+
+        :return:
+        """
         self.bigram_frequencies = []
 
     def reducer(self, word, stripes):
         """
+        Adds up the individual stripes from each reducer
+        and then calculates the conditional probability
 
         :param word:
         :param stripes:
@@ -54,6 +69,10 @@ class MRWordBigramProb(MRJob):
             self.bigram_frequencies.append((word, following_word, (counts[following_word] / count_total)))
 
     def reducer_final(self):
+        """
+        sorts the stored bigram frequencies based on the first word in the bigram and the number of occurences
+        :return:
+        """
         sorted_bigram_frequencies = sorted(self.bigram_frequencies, key=operator.itemgetter(0, 2))
         for bigram in sorted_bigram_frequencies:
             yield bigram[0] + "-" + bigram[1], bigram[2]
