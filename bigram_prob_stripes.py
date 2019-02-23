@@ -46,7 +46,7 @@ class MRWordBigramProb(MRJob):
 
     def reducer_init(self):
         """
-        Keeps state over multiple reduce iterations and required for sorting
+        Keeps state over multiple reduce iterations, required for sorting the final output
 
         :return:
         """
