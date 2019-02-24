@@ -70,7 +70,10 @@ class MRWordBigramProb(MRJob):
 
     def reducer_final(self):
         """
-        sorts the stored bigram frequencies based on the first word in the bigram and the number of occurences
+        Sorts the triples of (word, following word, frequency of the bigram)
+        based word and then frequency of the bigram (word, following word).
+        Outputs sorted values.
+
         :return:
         """
         sorted_bigram_frequencies = sorted(self.bigram_frequencies, key=operator.itemgetter(0, 2))
