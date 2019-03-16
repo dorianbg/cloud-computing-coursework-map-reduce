@@ -1,0 +1,94 @@
+2019-02-23 13:47:08,786 INFO org.apache.hadoop.yarn.client.RMProxy (main): Connecting to ResourceManager at ip-172-31-1-17.eu-west-1.compute.internal/172.31.1.17:8032
+2019-02-23 13:47:08,992 INFO org.apache.hadoop.yarn.client.RMProxy (main): Connecting to ResourceManager at ip-172-31-1-17.eu-west-1.compute.internal/172.31.1.17:8032
+2019-02-23 13:47:09,467 INFO com.amazon.ws.emr.hadoop.fs.s3n.S3NativeFileSystem (main): Opening 's3://mrjob-4657dfae0fe82f99/tmp/bigram_prob_stripes.dbg.20190223.134641.154626/files/bigram_prob_stripes.py#bigram_prob_stripes.py' for reading
+2019-02-23 13:47:09,701 INFO com.hadoop.compression.lzo.GPLNativeCodeLoader (main): Loaded native gpl library
+2019-02-23 13:47:09,704 INFO com.hadoop.compression.lzo.LzoCodec (main): Successfully loaded & initialized native-lzo library [hadoop-lzo rev 9ced33b6ec3ec44d932798fa9ee2f1158a5fdcde]
+2019-02-23 13:47:09,724 INFO org.apache.hadoop.mapred.FileInputFormat (main): Total input files to process : 1
+2019-02-23 13:47:10,592 INFO org.apache.hadoop.mapreduce.JobSubmitter (main): number of splits:12
+2019-02-23 13:47:10,704 INFO org.apache.hadoop.mapreduce.JobSubmitter (main): Submitting tokens for job: job_1550925459287_0012
+2019-02-23 13:47:10,862 INFO org.apache.hadoop.yarn.client.api.impl.YarnClientImpl (main): Submitted application application_1550925459287_0012
+2019-02-23 13:47:10,898 INFO org.apache.hadoop.mapreduce.Job (main): The url to track the job: http://ip-172-31-1-17.eu-west-1.compute.internal:20888/proxy/application_1550925459287_0012/
+2019-02-23 13:47:10,899 INFO org.apache.hadoop.mapreduce.Job (main): Running job: job_1550925459287_0012
+2019-02-23 13:47:16,994 INFO org.apache.hadoop.mapreduce.Job (main): Job job_1550925459287_0012 running in uber mode : false
+2019-02-23 13:47:16,995 INFO org.apache.hadoop.mapreduce.Job (main):  map 0% reduce 0%
+2019-02-23 13:47:27,070 INFO org.apache.hadoop.mapreduce.Job (main):  map 8% reduce 0%
+2019-02-23 13:47:28,075 INFO org.apache.hadoop.mapreduce.Job (main):  map 17% reduce 0%
+2019-02-23 13:47:36,129 INFO org.apache.hadoop.mapreduce.Job (main):  map 25% reduce 0%
+2019-02-23 13:47:37,133 INFO org.apache.hadoop.mapreduce.Job (main):  map 33% reduce 0%
+2019-02-23 13:47:45,181 INFO org.apache.hadoop.mapreduce.Job (main):  map 42% reduce 0%
+2019-02-23 13:47:46,186 INFO org.apache.hadoop.mapreduce.Job (main):  map 50% reduce 0%
+2019-02-23 13:47:54,230 INFO org.apache.hadoop.mapreduce.Job (main):  map 58% reduce 0%
+2019-02-23 13:47:55,235 INFO org.apache.hadoop.mapreduce.Job (main):  map 67% reduce 0%
+2019-02-23 13:48:03,270 INFO org.apache.hadoop.mapreduce.Job (main):  map 75% reduce 0%
+2019-02-23 13:48:04,274 INFO org.apache.hadoop.mapreduce.Job (main):  map 83% reduce 0%
+2019-02-23 13:48:12,311 INFO org.apache.hadoop.mapreduce.Job (main):  map 100% reduce 0%
+2019-02-23 13:48:21,357 INFO org.apache.hadoop.mapreduce.Job (main):  map 100% reduce 20%
+2019-02-23 13:48:28,382 INFO org.apache.hadoop.mapreduce.Job (main):  map 100% reduce 40%
+2019-02-23 13:48:36,410 INFO org.apache.hadoop.mapreduce.Job (main):  map 100% reduce 60%
+2019-02-23 13:48:44,442 INFO org.apache.hadoop.mapreduce.Job (main):  map 100% reduce 80%
+2019-02-23 13:48:52,476 INFO org.apache.hadoop.mapreduce.Job (main):  map 100% reduce 100%
+2019-02-23 13:48:53,487 INFO org.apache.hadoop.mapreduce.Job (main): Job job_1550925459287_0012 completed successfully
+2019-02-23 13:48:53,625 INFO org.apache.hadoop.mapreduce.Job (main): Counters: 56
+	File System Counters
+		FILE: Number of bytes read=10675025
+		FILE: Number of bytes written=26102265
+		FILE: Number of read operations=0
+		FILE: Number of large read operations=0
+		FILE: Number of write operations=0
+		HDFS: Number of bytes read=1104
+		HDFS: Number of bytes written=0
+		HDFS: Number of read operations=12
+		HDFS: Number of large read operations=0
+		HDFS: Number of write operations=0
+		S3: Number of bytes read=24206428
+		S3: Number of bytes written=29574517
+		S3: Number of read operations=0
+		S3: Number of large read operations=0
+		S3: Number of write operations=0
+	Job Counters 
+		Killed map tasks=1
+		Killed reduce tasks=1
+		Launched map tasks=12
+		Launched reduce tasks=5
+		Data-local map tasks=12
+		Total time spent by all maps in occupied slots (ms)=4140796
+		Total time spent by all reduces in occupied slots (ms)=3030192
+		Total time spent by all map tasks (ms)=94109
+		Total time spent by all reduce tasks (ms)=34434
+		Total vcore-milliseconds taken by all map tasks=94109
+		Total vcore-milliseconds taken by all reduce tasks=34434
+		Total megabyte-milliseconds taken by all map tasks=132505472
+		Total megabyte-milliseconds taken by all reduce tasks=96966144
+	Map-Reduce Framework
+		Map input records=231658
+		Map output records=214683
+		Map output bytes=22266469
+		Map output materialized bytes=12498587
+		Input split bytes=1104
+		Combine input records=0
+		Combine output records=0
+		Reduce input groups=53140
+		Reduce shuffle bytes=12498587
+		Reduce input records=214683
+		Reduce output records=868014
+		Spilled Records=429366
+		Shuffled Maps =60
+		Failed Shuffles=0
+		Merged Map outputs=60
+		GC time elapsed (ms)=2899
+		CPU time spent (ms)=42050
+		Physical memory (bytes) snapshot=8857755648
+		Virtual memory (bytes) snapshot=60782628864
+		Total committed heap usage (bytes)=7428636672
+	Shuffle Errors
+		BAD_ID=0
+		CONNECTION=0
+		IO_ERROR=0
+		WRONG_LENGTH=0
+		WRONG_MAP=0
+		WRONG_REDUCE=0
+	File Input Format Counters 
+		Bytes Read=24206428
+	File Output Format Counters 
+		Bytes Written=29574517
+2019-02-23 13:48:53,625 INFO org.apache.hadoop.streaming.StreamJob (main): Output directory: s3://mapreduce123443/output/bigram_prob_stripes_final/
