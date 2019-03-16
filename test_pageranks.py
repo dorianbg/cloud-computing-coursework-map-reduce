@@ -1,9 +1,12 @@
+"""
+the script computes page ranks using the networkx library
+"""
 import networkx as nx
 import heapq
 # Initialize directed graph
 G = nx.DiGraph()
 
-input_file = "/Volumes/SD/PyCharmProjects/cc_coursework/data/soc-Epinions1.txt"
+input_file = "data/soc-Epinions1.txt"
 with open(input_file) as f:
     for line in f.readlines():
         line = line.split("\t")

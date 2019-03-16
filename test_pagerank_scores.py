@@ -1,3 +1,6 @@
+"""
+the script simply sums up the pagerank scores outputted by the map reduce job
+"""
 import os
 from pathlib import Path
 

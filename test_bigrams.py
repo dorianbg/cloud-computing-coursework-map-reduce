@@ -5,7 +5,7 @@ import pandas as pd
 
 
 """
-The script just 
+The script just counts up the bigrams with a specific first part of the bigram
 """
 
 bigrams = []

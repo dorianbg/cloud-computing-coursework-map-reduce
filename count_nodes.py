@@ -1,4 +1,7 @@
-input_file = "/Volumes/SD/PyCharmProjects/cc_coursework/data/soc-Epinions1.txt"
+"""
+the script counts the number of nodes in the input dataset
+"""
+input_file = "data/soc-Epinions1.txt"
 
 nodes = []
 with open(input_file) as f:
