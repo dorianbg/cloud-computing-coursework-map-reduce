@@ -5,7 +5,8 @@ import operator
 
 
 class MRWordBigramProb(MRJob):
-    MRJob.PARTITIONER = 'org.apache.hadoop.mapred.lib.KeyFieldBasedPartitioner'
+    #PARTITIONER = 'org.apache.hadoop.mapred.lib.KeyFieldBasedPartitioner'
+    SORT_VALUES = True
 
     def mapper_init(self):
         """
@@ -18,9 +19,7 @@ class MRWordBigramProb(MRJob):
     def mapper(self, joke_id, content):
         """
         For each encountered word in joke, it increments the count for the bigram
-
         with it's following word.
-
         it also adds the value to "*"
 
         Note that we ignore the last word in a sentence as it has no following words.
@@ -56,9 +55,10 @@ class MRWordBigramProb(MRJob):
 
     def reducer(self, pair, counts):
         """
-        Expects that the input pair (word, following_word) is partitioned by 1st key (word)
+        Expects that the input key (word, following_word) is partitioned by 1st part of the key (word)
         and sorted by the 2nd key (following word).
         It expects that "*" will be the first following word for every word.
+
         This is exactly specified in the config.
 
         Outputs a triple containing (word, following word, conditional probability).
@@ -76,8 +76,8 @@ class MRWordBigramProb(MRJob):
 
     def reducer_final(self):
         """
-        Sorts the triples of (word, following word, frequency of the combination)
-        based on 1st word and then frequency of the bigram (word, following word).
+        Sorts the triples of (word, following word, frequency of the bigram)
+        based word and then frequency of the bigram (word, following word).
         Outputs sorted values.
 
         :return:
@@ -87,25 +87,16 @@ class MRWordBigramProb(MRJob):
             yield bigram[0] + "-" + bigram[1], bigram[2]
 
     def steps(self):
-        """
-        jobconf = {
-            'mapred.output.key.comparator.class': 'org.apache.hadoop.mapred.lib.KeyFieldBasedComparator',
-            'mapred.text.key.comparator.options': '-k 1',
-            'mapred.text.key.partitioner.options': '-k 2',
-
-            'mapreduce.map.output.key.field.separator': ' ',
-            'stream.map.output.field.separator': ' ',
-            'mapreduce.partition.keypartitioner.options': '-k1,1',
-            'mapreduce.job.output.key.comparator.class': 'org.apache.hadoop.mapreduce.lib.partition.KeyFieldBasedComparator',
-            'mapreduce.partition.keycomparator.options': '-k2,2r',
-        }
-        """
-        jobconf = {
-            'stream.num.map.output.key.fields': '2',
-            'mapred.output.key.comparator.class': 'org.apache.hadoop.mapred.lib.KeyFieldBasedComparator',
-            'mapred.text.key.comparator.options': '-k2,2r',
-            'mapred.text.key.partitioner.options': '-k1,1',
-        }
+        # While these configs make sense, they are not necessary when SORT_VALEUS=True is used
+        #   https://mrjob.readthedocs.io/en/latest/job.html#mrjob.job.MRJob.SORT_VALUES
+        # jobconf = {
+        #     'mapred.output.key.comparator.class': 'org.apache.hadoop.mapred.lib.KeyFieldBasedComparator',
+        #     'mapred.text.key.comparator.options': '-k2r',
+        #     'mapred.text.key.partitioner.options': '-k1',
+        #     'stream.num.map.output.key.fields': 2,
+        #     'stream.map.output.field.separator' : "\t",
+        #     'mapreduce.map.output.key.field.separator': '\t',
+        # }
         return [
             MRStep(mapper_init=self.mapper_init,
                    mapper=self.mapper,
@@ -113,7 +104,7 @@ class MRWordBigramProb(MRJob):
                    reducer_init=self.reducer_init,
                    reducer=self.reducer,
                    reducer_final=self.reducer_final,
-                   jobconf=jobconf
+                   # jobconf=jobconf
             )
         ]
 
