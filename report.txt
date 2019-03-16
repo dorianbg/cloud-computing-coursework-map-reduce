@@ -1,0 +1,29 @@
+                    Report
+
+All of the figures were from a cluster made up of a Master instance of c4.xlarge type
+and a core instance of c4.xlarge type.
+Note that the programs executed a lot faster on my machine than on AWS and that I don't believe it represents the real efficiency of my code.
+
+1.a) Stripes
+    - the framework decided to use 12 mappers and 6 reducers
+    - it took 1 step to finish the application
+    - it took 1 minute and 40 seconds to finish the application
+
+1.b) Pairs
+    - the framework decided to use 4 mappers and 1 reducer
+    - it took 1 step to finish the application
+    - it took 1 minute and 10 seconds to finish the application
+
+2.a) Page rank simple
+    - the framework decided to use 12-16 mappers and 4-6 reducers for each iteration of page rank and  4 mappers and 1 reducer for sorting
+    - it took 13 steps to finish the application ( 1 step for converting the graph representation, 10 steps for 10 page rank iteration and 2 steps for final sorting)
+    - it took ~7 minutes to finish the application
+
+2.b) Page rank complete
+    - the framework decided to use 12-16 mappers and 4-6 reducers for each iteration of page rank and  4 mappers and 1 reducer for sorting
+    - it took 103 steps to finish the application ( 1 step for converting the graph representation, 100 steps for 50 page rank iteration and 2 steps for final sorting)
+    - it took ~62 minutes to finish the application
+
+
+Time spent on the problem(s):
+- I spent around 80 hours working on the problems
